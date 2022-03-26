@@ -10,7 +10,7 @@ int main(void)
 	
     while (1) 
     {
-		PORTC = 0b00000001;
+		PORTC = 0b00000111;
     }
 }
 

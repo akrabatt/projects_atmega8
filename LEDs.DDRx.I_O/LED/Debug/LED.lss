@@ -21,9 +21,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   8 .debug_frame  00000024  00000000  00000000  00000c94  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    0000028e  00000000  00000000  00000cb8  2**0
+  9 .debug_str    000002a0  00000000  00000000  00000cb8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000010  00000000  00000000  00000f46  2**0
+ 10 .debug_ranges 00000010  00000000  00000000  00000f58  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -76,8 +76,8 @@ int main(void)
 	
     while (1) 
     {
-		PORTC = 0b00000001;
-  3c:	81 e0       	ldi	r24, 0x01	; 1
+		PORTC = 0b00000111;
+  3c:	87 e0       	ldi	r24, 0x07	; 7
   3e:	85 bb       	out	0x15, r24	; 21
   40:	fd cf       	rjmp	.-6      	; 0x3c <main+0x4>
 
