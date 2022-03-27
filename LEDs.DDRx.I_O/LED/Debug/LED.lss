@@ -3,27 +3,27 @@ LED.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000046  00000000  00000000  00000054  2**1
+  0 .text         0000004a  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  0000009a  2**0
+  1 .data         00000000  00800060  00800060  0000009e  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  0000009a  2**0
+  2 .comment      00000030  00000000  00000000  0000009e  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000cc  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000d0  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  00000108  2**0
+  4 .debug_aranges 00000020  00000000  00000000  0000010c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000514  00000000  00000000  00000128  2**0
+  5 .debug_info   00000514  00000000  00000000  0000012c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000004a4  00000000  00000000  0000063c  2**0
+  6 .debug_abbrev 000004a4  00000000  00000000  00000640  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001b3  00000000  00000000  00000ae0  2**0
+  7 .debug_line   000001b9  00000000  00000000  00000ae4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00000c94  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000ca0  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002a0  00000000  00000000  00000cb8  2**0
+  9 .debug_str    000002a0  00000000  00000000  00000cc4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000010  00000000  00000000  00000f58  2**0
+ 10 .debug_ranges 00000010  00000000  00000000  00000f64  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -57,7 +57,7 @@ Disassembly of section .text:
   2e:	de bf       	out	0x3e, r29	; 62
   30:	cd bf       	out	0x3d, r28	; 61
   32:	02 d0       	rcall	.+4      	; 0x38 <main>
-  34:	06 c0       	rjmp	.+12     	; 0x42 <_exit>
+  34:	08 c0       	rjmp	.+16     	; 0x46 <_exit>
 
 00000036 <__bad_interrupt>:
   36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
@@ -68,21 +68,24 @@ Disassembly of section .text:
 
 int main(void)
 {
-	DDRC = 0b00011111;	// обозначили порт С на вход 
+	DDRC = 0b00011111;	// обозначили порт С на вход
   38:	8f e1       	ldi	r24, 0x1F	; 31
   3a:	84 bb       	out	0x14, r24	; 20
+	DDRB = 0b11111111;	// обозначили порт С на вход(в данном случае каждый выход имеет низкий уровень) 
+  3c:	8f ef       	ldi	r24, 0xFF	; 255
+  3e:	87 bb       	out	0x17, r24	; 23
 	//PINC = 0b00000001;	// подали высокий уровень сигнала на вывод
 	
 	
     while (1) 
     {
 		PORTC = 0b00000111;
-  3c:	87 e0       	ldi	r24, 0x07	; 7
-  3e:	85 bb       	out	0x15, r24	; 21
-  40:	fd cf       	rjmp	.-6      	; 0x3c <main+0x4>
+  40:	87 e0       	ldi	r24, 0x07	; 7
+  42:	85 bb       	out	0x15, r24	; 21
+  44:	fd cf       	rjmp	.-6      	; 0x40 <__SREG__+0x1>
 
-00000042 <_exit>:
-  42:	f8 94       	cli
+00000046 <_exit>:
+  46:	f8 94       	cli
 
-00000044 <__stop_program>:
-  44:	ff cf       	rjmp	.-2      	; 0x44 <__stop_program>
+00000048 <__stop_program>:
+  48:	ff cf       	rjmp	.-2      	; 0x48 <__stop_program>
