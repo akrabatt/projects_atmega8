@@ -3,27 +3,29 @@ LED_delay_2.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         0000006c  00000000  00000000  00000054  2**1
+  0 .text         00000092  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  000000c0  2**0
+  1 .data         00000000  00800060  00800060  000000e6  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  000000c0  2**0
+  2 .comment      00000030  00000000  00000000  000000e6  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000f0  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000118  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  0000012c  2**0
+  4 .debug_aranges 00000020  00000000  00000000  00000154  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   0000053d  00000000  00000000  0000014c  2**0
+  5 .debug_info   000005fb  00000000  00000000  00000174  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000004c7  00000000  00000000  00000689  2**0
+  6 .debug_abbrev 00000540  00000000  00000000  0000076f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001cf  00000000  00000000  00000b50  2**0
+  7 .debug_line   00000253  00000000  00000000  00000caf  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00000d20  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000f04  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002b5  00000000  00000000  00000d44  2**0
+  9 .debug_str    00000300  00000000  00000000  00000f28  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000010  00000000  00000000  00000ff9  2**0
+ 10 .debug_loc    00000090  00000000  00000000  00001228  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000010  00000000  00000000  000012b8  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -61,7 +63,7 @@ Disassembly of section .text:
   32:	10 e0       	ldi	r17, 0x00	; 0
   34:	a0 e6       	ldi	r26, 0x60	; 96
   36:	b0 e0       	ldi	r27, 0x00	; 0
-  38:	ec e6       	ldi	r30, 0x6C	; 108
+  38:	e2 e9       	ldi	r30, 0x92	; 146
   3a:	f0 e0       	ldi	r31, 0x00	; 0
   3c:	02 c0       	rjmp	.+4      	; 0x42 <__SREG__+0x3>
   3e:	05 90       	lpm	r0, Z+
@@ -70,44 +72,75 @@ Disassembly of section .text:
   44:	b1 07       	cpc	r27, r17
   46:	d9 f7       	brne	.-10     	; 0x3e <__SP_H__>
   48:	02 d0       	rcall	.+4      	; 0x4e <main>
-  4a:	0e c0       	rjmp	.+28     	; 0x68 <_exit>
+  4a:	21 c0       	rjmp	.+66     	; 0x8e <_exit>
 
 0000004c <__bad_interrupt>:
   4c:	d9 cf       	rjmp	.-78     	; 0x0 <__vectors>
 
 0000004e <main>:
-				0b01000000,0b10000000, 
-				0b00000000};
+                0b01000000,0b10000000, 
+                0b00000000};
 
 int main(void)
 {
-	DDRD = 0b11111111;	// определяем порт D
+    DDRD = 0b11111111;  // светодиоды. настроили порт навыход
   4e:	8f ef       	ldi	r24, 0xFF	; 255
   50:	81 bb       	out	0x11, r24	; 17
-	DDRB = 0b11111111;	// определяем порт B
-  52:	87 bb       	out	0x17, r24	; 23
-	DDRC = 0b11111111;	// определяем порт C
-  54:	84 bb       	out	0x14, r24	; 20
-	LEDS_D = 0b00000000;
-  56:	12 ba       	out	0x12, r1	; 18
-	BUTTON = 0b00000011;
-  58:	83 e0       	ldi	r24, 0x03	; 3
-  5a:	85 bb       	out	0x15, r24	; 21
-	
-	while (1)
-	{	
-		if (PINC == 0b11111110)
-  5c:	83 b3       	in	r24, 0x13	; 19
-  5e:	8e 3f       	cpi	r24, 0xFE	; 254
-  60:	e9 f7       	brne	.-6      	; 0x5c <main+0xe>
-		{
-			LEDS_D = 0b00000001;
-  62:	81 e0       	ldi	r24, 0x01	; 1
-  64:	82 bb       	out	0x12, r24	; 18
-  66:	fa cf       	rjmp	.-12     	; 0x5c <main+0xe>
+    DDRB = 0b00000000;  // кнопки. настроили порты на входы
+  52:	17 ba       	out	0x17, r1	; 23
+    PORTD = 0b00000000; // светодиод. подали на порты низкий уровень сигнала
+  54:	12 ba       	out	0x12, r1	; 18
+    PORTB = 0b11111111; // кнопка. подали на порты высокий уровень сигнала
+  56:	88 bb       	out	0x18, r24	; 24
+    
+    while (1)
+    {
+        if (PINB == 0b11111110)	// если первая кнопка нажата
+  58:	86 b3       	in	r24, 0x16	; 22
+  5a:	8e 3f       	cpi	r24, 0xFE	; 254
+  5c:	b1 f4       	brne	.+44     	; 0x8a <main+0x3c>
+        {
+            PORTD = 0b11111111;	// подаем высокий уровень сигнала на выходы 
+  5e:	8f ef       	ldi	r24, 0xFF	; 255
+  60:	82 bb       	out	0x12, r24	; 18
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
 
-00000068 <_exit>:
-  68:	f8 94       	cli
+	__builtin_avr_delay_cycles(__ticks_dc);
+  62:	2f e9       	ldi	r18, 0x9F	; 159
+  64:	86 e8       	ldi	r24, 0x86	; 134
+  66:	91 e0       	ldi	r25, 0x01	; 1
+  68:	21 50       	subi	r18, 0x01	; 1
+  6a:	80 40       	sbci	r24, 0x00	; 0
+  6c:	90 40       	sbci	r25, 0x00	; 0
+  6e:	e1 f7       	brne	.-8      	; 0x68 <main+0x1a>
+  70:	00 c0       	rjmp	.+0      	; 0x72 <main+0x24>
+  72:	00 00       	nop
+            _delay_ms(sec);	// задержка
+            PORTD = 0b00000000;	// подаем назкий уровень сигнала на выходы
+  74:	12 ba       	out	0x12, r1	; 18
+  76:	2f e9       	ldi	r18, 0x9F	; 159
+  78:	86 e8       	ldi	r24, 0x86	; 134
+  7a:	91 e0       	ldi	r25, 0x01	; 1
+  7c:	21 50       	subi	r18, 0x01	; 1
+  7e:	80 40       	sbci	r24, 0x00	; 0
+  80:	90 40       	sbci	r25, 0x00	; 0
+  82:	e1 f7       	brne	.-8      	; 0x7c <main+0x2e>
+  84:	00 c0       	rjmp	.+0      	; 0x86 <main+0x38>
+  86:	00 00       	nop
+  88:	e7 cf       	rjmp	.-50     	; 0x58 <main+0xa>
+            _delay_ms(sec);	// задержка
+        }
+        else   // если кнопка не нажата
+        {
+            PORTD = 0b00000000;	// подаем низкий уровень сигнала на выходы
+  8a:	12 ba       	out	0x12, r1	; 18
+  8c:	e5 cf       	rjmp	.-54     	; 0x58 <main+0xa>
 
-0000006a <__stop_program>:
-  6a:	ff cf       	rjmp	.-2      	; 0x6a <__stop_program>
+0000008e <_exit>:
+  8e:	f8 94       	cli
+
+00000090 <__stop_program>:
+  90:	ff cf       	rjmp	.-2      	; 0x90 <__stop_program>
