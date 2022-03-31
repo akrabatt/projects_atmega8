@@ -391,10 +391,10 @@ END GROUP
  .debug_abbrev  0x00000000      0x44e C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega8/avr4/crtatmega8.o
  .debug_abbrev  0x0000044e      0x108 main.o
 
-.debug_line     0x00000000      0x2b7
+.debug_line     0x00000000      0x29f
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x10a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.6.364/gcc/dev/atmega8/avr4/crtatmega8.o
- .debug_line    0x0000010a      0x1ad main.o
+ .debug_line    0x0000010a      0x195 main.o
 
 .debug_frame    0x00000000       0x24
  *(.debug_frame)
@@ -406,9 +406,9 @@ END GROUP
  .debug_str     0x0000017a      0x193 main.o
                                 0x1c7 (size before relaxing)
 
-.debug_loc      0x00000000      0x170
+.debug_loc      0x00000000      0x1aa
  *(.debug_loc)
- .debug_loc     0x00000000      0x170 main.o
+ .debug_loc     0x00000000      0x1aa main.o
 
 .debug_macinfo
  *(.debug_macinfo)
