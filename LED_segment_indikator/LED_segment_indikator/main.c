@@ -16,14 +16,32 @@ int main(void)
 {
 	DDRD = 0b11111111;
 	DDRC = 0b11111111;
-	PORTC = 0b00000011;
+	PORTB = 0b00000011;
+	PORTD = 0b00000000;
+	int y = 0;
+	int up = 0;
+	int down = 0;
 	
     while (1) 
     {
-		//for(int i = 0; i <= 9; PORTD = nums[i++])
-		//{
-			//_delay_ms(sec);
-		//}
-    }
+		if (PINB == 0b00000010) up = 1;
+		if ((PINB == 0b00000011) && up == 1)
+		{
+			up = 0;
+			PORTD = nums[y];
+			_delay_ms(100);
+			y++;
+			if (y == 10) y = 0;
+		}
+		if (PINB == 0b00000001) down = 1;
+		if ((PINB == 0b00000011) && down == 1)
+		{
+			down = 0;
+			PORTD = nums[y];
+			_delay_ms(100);
+			y--;
+			if (y < 0) y = 9;
+		}
+	}
 }
 
