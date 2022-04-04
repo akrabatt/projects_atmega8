@@ -3,29 +3,27 @@ LED_segment_indikator.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000000fa  00000000  00000000  00000074  2**1
+  0 .text         00000072  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000014  00800060  000000fa  0000016e  2**0
+  1 .data         00000014  00800060  00000072  000000e6  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  00000182  2**0
+  2 .comment      00000030  00000000  00000000  000000fa  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001b4  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  0000012c  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  000001f0  2**0
+  4 .debug_aranges 00000020  00000000  00000000  00000168  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000625  00000000  00000000  00000210  2**0
+  5 .debug_info   00000563  00000000  00000000  00000188  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 0000055e  00000000  00000000  00000835  2**0
+  6 .debug_abbrev 000004e7  00000000  00000000  000006eb  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000002bf  00000000  00000000  00000d93  2**0
+  7 .debug_line   000001d7  00000000  00000000  00000bd2  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00001054  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000dac  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000313  00000000  00000000  00001078  2**0
+  9 .debug_str    000002c8  00000000  00000000  00000dd0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000124  00000000  00000000  0000138b  2**0
-                  CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000010  00000000  00000000  000014af  2**0
+ 10 .debug_ranges 00000010  00000000  00000000  00001098  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -63,7 +61,7 @@ Disassembly of section .text:
   32:	10 e0       	ldi	r17, 0x00	; 0
   34:	a0 e6       	ldi	r26, 0x60	; 96
   36:	b0 e0       	ldi	r27, 0x00	; 0
-  38:	ea ef       	ldi	r30, 0xFA	; 250
+  38:	e2 e7       	ldi	r30, 0x72	; 114
   3a:	f0 e0       	ldi	r31, 0x00	; 0
   3c:	02 c0       	rjmp	.+4      	; 0x42 <__SREG__+0x3>
   3e:	05 90       	lpm	r0, Z+
@@ -72,7 +70,7 @@ Disassembly of section .text:
   44:	b1 07       	cpc	r27, r17
   46:	d9 f7       	brne	.-10     	; 0x3e <__SP_H__>
   48:	02 d0       	rcall	.+4      	; 0x4e <main>
-  4a:	55 c0       	rjmp	.+170    	; 0xf6 <_exit>
+  4a:	11 c0       	rjmp	.+34     	; 0x6e <_exit>
 
 0000004c <__bad_interrupt>:
   4c:	d9 cf       	rjmp	.-78     	; 0x0 <__vectors>
@@ -86,163 +84,33 @@ int main(void)
 	DDRD = 0b11111111;
   4e:	8f ef       	ldi	r24, 0xFF	; 255
   50:	81 bb       	out	0x11, r24	; 17
-	DDRC = 0b11111111;
-  52:	84 bb       	out	0x14, r24	; 20
-	PORTB = 0b00000011;
+	DDRB = 0b11111111;
+  52:	87 bb       	out	0x17, r24	; 23
+	DDRC = 0b00000011;
   54:	83 e0       	ldi	r24, 0x03	; 3
-  56:	88 bb       	out	0x18, r24	; 24
-	PORTD = 0b00000000;
-  58:	12 ba       	out	0x12, r1	; 18
-	int y = 0;
-	int up = 0;
-	int down = 0;
-  5a:	20 e0       	ldi	r18, 0x00	; 0
-  5c:	30 e0       	ldi	r19, 0x00	; 0
-	DDRD = 0b11111111;
-	DDRC = 0b11111111;
+  56:	84 bb       	out	0x14, r24	; 20
 	PORTB = 0b00000011;
+  58:	88 bb       	out	0x18, r24	; 24
 	PORTD = 0b00000000;
-	int y = 0;
-	int up = 0;
-  5e:	40 e0       	ldi	r20, 0x00	; 0
-  60:	50 e0       	ldi	r21, 0x00	; 0
-{
-	DDRD = 0b11111111;
-	DDRC = 0b11111111;
-	PORTB = 0b00000011;
-	PORTD = 0b00000000;
-	int y = 0;
-  62:	60 e0       	ldi	r22, 0x00	; 0
-  64:	70 e0       	ldi	r23, 0x00	; 0
-  66:	04 c0       	rjmp	.+8      	; 0x70 <main+0x22>
-			if (y == 10) y = 0;
-		}
-		if (PINB == 0b00000001) down = 1;
-		if ((PINB == 0b00000011) && down == 1)
-		{
-			down = 0;
-  68:	20 e0       	ldi	r18, 0x00	; 0
-  6a:	30 e0       	ldi	r19, 0x00	; 0
-			PORTD = nums[y];
-			_delay_ms(100);
-			y--;
-			if (y < 0) y = 9;
-  6c:	69 e0       	ldi	r22, 0x09	; 9
-  6e:	70 e0       	ldi	r23, 0x00	; 0
+  5a:	12 ba       	out	0x12, r1	; 18
 	int up = 0;
 	int down = 0;
 	
     while (1) 
     {
-		if (PINB == 0b00000010) up = 1;
-  70:	86 b3       	in	r24, 0x16	; 22
-  72:	82 30       	cpi	r24, 0x02	; 2
-  74:	11 f4       	brne	.+4      	; 0x7a <main+0x2c>
-  76:	41 e0       	ldi	r20, 0x01	; 1
-  78:	50 e0       	ldi	r21, 0x00	; 0
-		if ((PINB == 0b00000011) && up == 1)
-  7a:	86 b3       	in	r24, 0x16	; 22
-  7c:	83 30       	cpi	r24, 0x03	; 3
-  7e:	e1 f4       	brne	.+56     	; 0xb8 <main+0x6a>
-  80:	41 30       	cpi	r20, 0x01	; 1
-  82:	51 05       	cpc	r21, r1
-  84:	c9 f4       	brne	.+50     	; 0xb8 <main+0x6a>
-		{
-			up = 0;
-			PORTD = nums[y];
-  86:	fb 01       	movw	r30, r22
-  88:	ee 0f       	add	r30, r30
-  8a:	ff 1f       	adc	r31, r31
-  8c:	e0 5a       	subi	r30, 0xA0	; 160
-  8e:	ff 4f       	sbci	r31, 0xFF	; 255
-  90:	80 81       	ld	r24, Z
-  92:	82 bb       	out	0x12, r24	; 18
-	#else
-		//round up by default
-		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
-	#endif
+		PORTD |= nums[0];
+  5c:	92 b3       	in	r25, 0x12	; 18
+  5e:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
+  62:	89 2b       	or	r24, r25
+  64:	82 bb       	out	0x12, r24	; 18
+		PORTC |= 0b00000001;
+  66:	85 b3       	in	r24, 0x15	; 21
+  68:	81 60       	ori	r24, 0x01	; 1
+  6a:	85 bb       	out	0x15, r24	; 21
+  6c:	f7 cf       	rjmp	.-18     	; 0x5c <main+0xe>
 
-	__builtin_avr_delay_cycles(__ticks_dc);
-  94:	87 ea       	ldi	r24, 0xA7	; 167
-  96:	91 e6       	ldi	r25, 0x61	; 97
-  98:	01 97       	sbiw	r24, 0x01	; 1
-  9a:	f1 f7       	brne	.-4      	; 0x98 <main+0x4a>
-  9c:	00 c0       	rjmp	.+0      	; 0x9e <main+0x50>
-  9e:	00 00       	nop
-			_delay_ms(100);
-			y++;
-  a0:	6f 5f       	subi	r22, 0xFF	; 255
-  a2:	7f 4f       	sbci	r23, 0xFF	; 255
-			if (y == 10) y = 0;
-  a4:	6a 30       	cpi	r22, 0x0A	; 10
-  a6:	71 05       	cpc	r23, r1
-  a8:	19 f0       	breq	.+6      	; 0xb0 <main+0x62>
-    while (1) 
-    {
-		if (PINB == 0b00000010) up = 1;
-		if ((PINB == 0b00000011) && up == 1)
-		{
-			up = 0;
-  aa:	40 e0       	ldi	r20, 0x00	; 0
-  ac:	50 e0       	ldi	r21, 0x00	; 0
-  ae:	04 c0       	rjmp	.+8      	; 0xb8 <main+0x6a>
-  b0:	40 e0       	ldi	r20, 0x00	; 0
-  b2:	50 e0       	ldi	r21, 0x00	; 0
-			PORTD = nums[y];
-			_delay_ms(100);
-			y++;
-			if (y == 10) y = 0;
-  b4:	60 e0       	ldi	r22, 0x00	; 0
-  b6:	70 e0       	ldi	r23, 0x00	; 0
-		}
-		if (PINB == 0b00000001) down = 1;
-  b8:	86 b3       	in	r24, 0x16	; 22
-  ba:	81 30       	cpi	r24, 0x01	; 1
-  bc:	11 f4       	brne	.+4      	; 0xc2 <main+0x74>
-  be:	21 e0       	ldi	r18, 0x01	; 1
-  c0:	30 e0       	ldi	r19, 0x00	; 0
-		if ((PINB == 0b00000011) && down == 1)
-  c2:	86 b3       	in	r24, 0x16	; 22
-  c4:	83 30       	cpi	r24, 0x03	; 3
-  c6:	a1 f6       	brne	.-88     	; 0x70 <main+0x22>
-  c8:	21 30       	cpi	r18, 0x01	; 1
-  ca:	31 05       	cpc	r19, r1
-  cc:	89 f6       	brne	.-94     	; 0x70 <main+0x22>
-		{
-			down = 0;
-			PORTD = nums[y];
-  ce:	fb 01       	movw	r30, r22
-  d0:	ee 0f       	add	r30, r30
-  d2:	ff 1f       	adc	r31, r31
-  d4:	e0 5a       	subi	r30, 0xA0	; 160
-  d6:	ff 4f       	sbci	r31, 0xFF	; 255
-  d8:	80 81       	ld	r24, Z
-  da:	82 bb       	out	0x12, r24	; 18
-  dc:	87 ea       	ldi	r24, 0xA7	; 167
-  de:	91 e6       	ldi	r25, 0x61	; 97
-  e0:	01 97       	sbiw	r24, 0x01	; 1
-  e2:	f1 f7       	brne	.-4      	; 0xe0 <main+0x92>
-  e4:	00 c0       	rjmp	.+0      	; 0xe6 <main+0x98>
-  e6:	00 00       	nop
-			_delay_ms(100);
-			y--;
-  e8:	61 50       	subi	r22, 0x01	; 1
-  ea:	71 09       	sbc	r23, r1
-			if (y < 0) y = 9;
-  ec:	0a f4       	brpl	.+2      	; 0xf0 <main+0xa2>
-  ee:	bc cf       	rjmp	.-136    	; 0x68 <main+0x1a>
-			if (y == 10) y = 0;
-		}
-		if (PINB == 0b00000001) down = 1;
-		if ((PINB == 0b00000011) && down == 1)
-		{
-			down = 0;
-  f0:	20 e0       	ldi	r18, 0x00	; 0
-  f2:	30 e0       	ldi	r19, 0x00	; 0
-  f4:	bd cf       	rjmp	.-134    	; 0x70 <main+0x22>
+0000006e <_exit>:
+  6e:	f8 94       	cli
 
-000000f6 <_exit>:
-  f6:	f8 94       	cli
-
-000000f8 <__stop_program>:
-  f8:	ff cf       	rjmp	.-2      	; 0xf8 <__stop_program>
+00000070 <__stop_program>:
+  70:	ff cf       	rjmp	.-2      	; 0x70 <__stop_program>
