@@ -3,29 +3,27 @@ logic_operations.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000000a4  00000000  00000000  00000054  2**1
+  0 .text         0000007a  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  000000f8  2**0
+  1 .data         00000000  00800060  00800060  000000ce  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  000000f8  2**0
+  2 .comment      00000030  00000000  00000000  000000ce  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000128  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000100  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  00000164  2**0
+  4 .debug_aranges 00000020  00000000  00000000  0000013c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   0000058f  00000000  00000000  00000184  2**0
+  5 .debug_info   00000566  00000000  00000000  0000015c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000004ff  00000000  00000000  00000713  2**0
+  6 .debug_abbrev 000004d0  00000000  00000000  000006c2  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001f9  00000000  00000000  00000c12  2**0
+  7 .debug_line   000001c3  00000000  00000000  00000b92  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00000e0c  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000d58  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002c4  00000000  00000000  00000e30  2**0
+  9 .debug_str    000002bf  00000000  00000000  00000d7c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000040  00000000  00000000  000010f4  2**0
-                  CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000010  00000000  00000000  00001134  2**0
+ 10 .debug_ranges 00000010  00000000  00000000  0000103b  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -63,7 +61,7 @@ Disassembly of section .text:
   32:	10 e0       	ldi	r17, 0x00	; 0
   34:	a0 e6       	ldi	r26, 0x60	; 96
   36:	b0 e0       	ldi	r27, 0x00	; 0
-  38:	e4 ea       	ldi	r30, 0xA4	; 164
+  38:	ea e7       	ldi	r30, 0x7A	; 122
   3a:	f0 e0       	ldi	r31, 0x00	; 0
   3c:	02 c0       	rjmp	.+4      	; 0x42 <__SREG__+0x3>
   3e:	05 90       	lpm	r0, Z+
@@ -86,7 +84,7 @@ Disassembly of section .text:
   54:	b2 07       	cpc	r27, r18
   56:	e1 f7       	brne	.-8      	; 0x50 <.do_clear_bss_loop>
   58:	02 d0       	rcall	.+4      	; 0x5e <main>
-  5a:	22 c0       	rjmp	.+68     	; 0xa0 <_exit>
+  5a:	0d c0       	rjmp	.+26     	; 0x76 <_exit>
 
 0000005c <__bad_interrupt>:
   5c:	d1 cf       	rjmp	.-94     	; 0x0 <__vectors>
@@ -97,75 +95,32 @@ int redg[] = {};
 
 int main(void)
 {
-    DDRD = 0b11111111; // определяем все порты D, как выходы 
+    DDRD = 0b11111111;
   5e:	8f ef       	ldi	r24, 0xFF	; 255
   60:	81 bb       	out	0x11, r24	; 17
-    DDRB |= (0 << 0);   // определяем 2 порта D как входы
+	
+    DDRB |= (0 << 0) | (0 << 1);
   62:	87 b3       	in	r24, 0x17	; 23
   64:	87 bb       	out	0x17, r24	; 23
-    DDRB |= (0 << 1);   // определяем 2 порта D как входы
-  66:	87 b3       	in	r24, 0x17	; 23
-  68:	87 bb       	out	0x17, r24	; 23
-
-    PORTB |= (1 << 0);  // включаем подтягивающий резистор
-  6a:	88 b3       	in	r24, 0x18	; 24
-  6c:	81 60       	ori	r24, 0x01	; 1
-  6e:	88 bb       	out	0x18, r24	; 24
-    PORTB |= (1 << 1);  // включаем подтягивающий резистор
-  70:	88 b3       	in	r24, 0x18	; 24
-  72:	82 60       	ori	r24, 0x02	; 2
-  74:	88 bb       	out	0x18, r24	; 24
-
-    //PORTD = 0b00000000; // высокое входное напряжение
-
-    int y = 0;  // счётчик
-    int up = 0; // флаг на увеличение   
-  76:	20 e0       	ldi	r18, 0x00	; 0
-  78:	30 e0       	ldi	r19, 0x00	; 0
-    int down = 0;   // флаг на уменьшение 
-    
-    
+    PORTB |= (1 << 0) | (1 << 1);
+  66:	88 b3       	in	r24, 0x18	; 24
+  68:	83 60       	ori	r24, 0x03	; 3
+  6a:	88 bb       	out	0x18, r24	; 24
+	
+ 
     while (1) 
-    {
-        if (PINB == (0 << 0)) up = 1; // устанавливаем флаг
-  7a:	86 b3       	in	r24, 0x16	; 22
-  7c:	81 11       	cpse	r24, r1
-  7e:	02 c0       	rjmp	.+4      	; 0x84 <main+0x26>
-  80:	21 e0       	ldi	r18, 0x01	; 1
-  82:	30 e0       	ldi	r19, 0x00	; 0
-        if ((PINB == (1 << 0)) && up == 1)    // при нажатии кнопки снимаем флаг и запускаем счетчик. на увеличение
-  84:	86 b3       	in	r24, 0x16	; 22
-  86:	81 30       	cpi	r24, 0x01	; 1
-  88:	41 f4       	brne	.+16     	; 0x9a <main+0x3c>
-  8a:	21 30       	cpi	r18, 0x01	; 1
-  8c:	31 05       	cpc	r19, r1
-  8e:	29 f4       	brne	.+10     	; 0x9a <main+0x3c>
-        {
-            up = 0;
-            PORTD |= 0b00000111;
-  90:	82 b3       	in	r24, 0x12	; 18
-  92:	87 60       	ori	r24, 0x07	; 7
-  94:	82 bb       	out	0x12, r24	; 18
-    while (1) 
-    {
-        if (PINB == (0 << 0)) up = 1; // устанавливаем флаг
-        if ((PINB == (1 << 0)) && up == 1)    // при нажатии кнопки снимаем флаг и запускаем счетчик. на увеличение
-        {
-            up = 0;
-  96:	20 e0       	ldi	r18, 0x00	; 0
-  98:	30 e0       	ldi	r19, 0x00	; 0
-            PORTD |= 0b00000111;
-           // _delay_ms(30);
-            if (y == 10) y = 0; // сброс счетчика при достижении лимита 
-        }
-        if (~PINB & (0 << 1)) down = 1;   // устанавливаем флаг
-  9a:	86 b3       	in	r24, 0x16	; 22
-        if ((PINB & (1 << 1)) && down == 1)  // цикл на уменьшение
-  9c:	86 b3       	in	r24, 0x16	; 22
-  9e:	ed cf       	rjmp	.-38     	; 0x7a <main+0x1c>
+    	
+        if (~PINB & (1 << 0)) 
+  6c:	b0 99       	sbic	0x16, 0	; 22
+  6e:	fe cf       	rjmp	.-4      	; 0x6c <main+0xe>
+		{
+		PORTD = (1 << 0); // если условие верное 
+  70:	81 e0       	ldi	r24, 0x01	; 1
+  72:	82 bb       	out	0x12, r24	; 18
+  74:	fb cf       	rjmp	.-10     	; 0x6c <main+0xe>
 
-000000a0 <_exit>:
-  a0:	f8 94       	cli
+00000076 <_exit>:
+  76:	f8 94       	cli
 
-000000a2 <__stop_program>:
-  a2:	ff cf       	rjmp	.-2      	; 0xa2 <__stop_program>
+00000078 <__stop_program>:
+  78:	ff cf       	rjmp	.-2      	; 0x78 <__stop_program>
