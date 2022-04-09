@@ -2,18 +2,6 @@
 #include <avr/io.h>
 #include <util/delay.h> // подключаем библиотеку задерки времени
 
-#define sec 400 // определяем значение времени
-#define LEDS_D PORTD    // назовем порт D для светодиодов
-#define LEDS_B PORTB    // назовем порт B для светодиодов
-#define BUTTON PORTC    // назовем порт С для кнопок 
-
-int nums[] = {0b00111111, 0b00000110, 0b01011011,   // цифры индикатора
-             0b01001111, 0b01100110, 0b01101101,
-             0b01111101, 0b000000111, 0b01111111,
-             0b01101111};
-             
-int redg[] = {};
-
 int main(void)
 {
     DDRD = (1 << 0) | (1 << 1);	// обозначаем порты D как выходы 
@@ -25,11 +13,11 @@ int main(void)
  
     while (1)
 	{
-		if(~PINB & (1 << 0)) PORTD |= (1 << 0);
-		else if(~PINB & (1 << 1)) PORTD |= (1 << 1);
+		if(~PINB & (1 << 0)) PORTD = (1 << 0);
+		else if(~PINB & (1 << 1)) PORTD = (1 << 1);
 		else
 		{
-			PORTD = (0 << 0) & (0 << 1);
+			PORTD = (0 << 0) | (0 << 1);
 		}
 	} 
 
