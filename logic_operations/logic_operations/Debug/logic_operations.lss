@@ -3,27 +3,27 @@ logic_operations.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         0000007a  00000000  00000000  00000054  2**1
+  0 .text         00000088  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  000000ce  2**0
+  1 .data         00000000  00800060  00800060  000000dc  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  000000ce  2**0
+  2 .comment      00000030  00000000  00000000  000000dc  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000100  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  0000010c  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  0000013c  2**0
+  4 .debug_aranges 00000020  00000000  00000000  00000148  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000566  00000000  00000000  0000015c  2**0
+  5 .debug_info   00000566  00000000  00000000  00000168  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000004d0  00000000  00000000  000006c2  2**0
+  6 .debug_abbrev 000004d0  00000000  00000000  000006ce  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001c3  00000000  00000000  00000b92  2**0
+  7 .debug_line   000001e7  00000000  00000000  00000b9e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00000d58  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000d88  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002bf  00000000  00000000  00000d7c  2**0
+  9 .debug_str    000002bf  00000000  00000000  00000dac  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000010  00000000  00000000  0000103b  2**0
+ 10 .debug_ranges 00000010  00000000  00000000  0000106b  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -61,7 +61,7 @@ Disassembly of section .text:
   32:	10 e0       	ldi	r17, 0x00	; 0
   34:	a0 e6       	ldi	r26, 0x60	; 96
   36:	b0 e0       	ldi	r27, 0x00	; 0
-  38:	ea e7       	ldi	r30, 0x7A	; 122
+  38:	e8 e8       	ldi	r30, 0x88	; 136
   3a:	f0 e0       	ldi	r31, 0x00	; 0
   3c:	02 c0       	rjmp	.+4      	; 0x42 <__SREG__+0x3>
   3e:	05 90       	lpm	r0, Z+
@@ -84,7 +84,7 @@ Disassembly of section .text:
   54:	b2 07       	cpc	r27, r18
   56:	e1 f7       	brne	.-8      	; 0x50 <.do_clear_bss_loop>
   58:	02 d0       	rcall	.+4      	; 0x5e <main>
-  5a:	0d c0       	rjmp	.+26     	; 0x76 <_exit>
+  5a:	14 c0       	rjmp	.+40     	; 0x84 <_exit>
 
 0000005c <__bad_interrupt>:
   5c:	d1 cf       	rjmp	.-94     	; 0x0 <__vectors>
@@ -95,32 +95,42 @@ int redg[] = {};
 
 int main(void)
 {
-    DDRD = 0b11111111;
-  5e:	8f ef       	ldi	r24, 0xFF	; 255
+    DDRD = (1 << 0) | (1 << 1);	// обозначаем порты D как выходы 
+  5e:	83 e0       	ldi	r24, 0x03	; 3
   60:	81 bb       	out	0x11, r24	; 17
+	PORTD = (0 << 0) | (0 << 1);	// подаем низкий уровень сигнала на выход
+  62:	12 ba       	out	0x12, r1	; 18
 	
-    DDRB |= (0 << 0) | (0 << 1);
-  62:	87 b3       	in	r24, 0x17	; 23
-  64:	87 bb       	out	0x17, r24	; 23
-    PORTB |= (1 << 0) | (1 << 1);
-  66:	88 b3       	in	r24, 0x18	; 24
-  68:	83 60       	ori	r24, 0x03	; 3
-  6a:	88 bb       	out	0x18, r24	; 24
+    DDRB = (0 << 0) | (0 << 1);	// обозначаем выходы кнопок 
+  64:	17 ba       	out	0x17, r1	; 23
+    PORTB = (1 << 0) | (1 << 1);	// включаем подтягивающий резистор 
+  66:	88 bb       	out	0x18, r24	; 24
 	
  
-    while (1) 
-    	
-        if (~PINB & (1 << 0)) 
-  6c:	b0 99       	sbic	0x16, 0	; 22
-  6e:	fe cf       	rjmp	.-4      	; 0x6c <main+0xe>
+    while (1)
+	{
+		if(~PINB & (1 << 0)) PORTD |= (1 << 0);
+  68:	b0 99       	sbic	0x16, 0	; 22
+  6a:	04 c0       	rjmp	.+8      	; 0x74 <main+0x16>
+  6c:	82 b3       	in	r24, 0x12	; 18
+  6e:	81 60       	ori	r24, 0x01	; 1
+  70:	82 bb       	out	0x12, r24	; 18
+  72:	fa cf       	rjmp	.-12     	; 0x68 <main+0xa>
+		else if(~PINB & (1 << 1)) PORTD |= (1 << 1);
+  74:	b1 99       	sbic	0x16, 1	; 22
+  76:	04 c0       	rjmp	.+8      	; 0x80 <main+0x22>
+  78:	82 b3       	in	r24, 0x12	; 18
+  7a:	82 60       	ori	r24, 0x02	; 2
+  7c:	82 bb       	out	0x12, r24	; 18
+  7e:	f4 cf       	rjmp	.-24     	; 0x68 <main+0xa>
+		else
 		{
-		PORTD = (1 << 0); // если условие верное 
-  70:	81 e0       	ldi	r24, 0x01	; 1
-  72:	82 bb       	out	0x12, r24	; 18
-  74:	fb cf       	rjmp	.-10     	; 0x6c <main+0xe>
+			PORTD = (0 << 0) & (0 << 1);
+  80:	12 ba       	out	0x12, r1	; 18
+  82:	f2 cf       	rjmp	.-28     	; 0x68 <main+0xa>
 
-00000076 <_exit>:
-  76:	f8 94       	cli
+00000084 <_exit>:
+  84:	f8 94       	cli
 
-00000078 <__stop_program>:
-  78:	ff cf       	rjmp	.-2      	; 0x78 <__stop_program>
+00000086 <__stop_program>:
+  86:	ff cf       	rjmp	.-2      	; 0x86 <__stop_program>
