@@ -3,29 +3,29 @@ logic_operations.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000000d4  00000000  00000000  00000054  2**1
+  0 .text         000000ce  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  00000128  2**0
+  1 .data         00000000  00800060  00800060  00000122  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  00000128  2**0
+  2 .comment      00000030  00000000  00000000  00000122  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000158  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000154  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  00000194  2**0
+  4 .debug_aranges 00000020  00000000  00000000  00000190  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000541  00000000  00000000  000001b4  2**0
+  5 .debug_info   00000541  00000000  00000000  000001b0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000004c2  00000000  00000000  000006f5  2**0
+  6 .debug_abbrev 000004c2  00000000  00000000  000006f1  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   0000024b  00000000  00000000  00000bb7  2**0
+  7 .debug_line   00000245  00000000  00000000  00000bb3  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00000e04  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000df8  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002bb  00000000  00000000  00000e28  2**0
+  9 .debug_str    000002bb  00000000  00000000  00000e1c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000000fc  00000000  00000000  000010e3  2**0
+ 10 .debug_loc    000000bd  00000000  00000000  000010d7  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000010  00000000  00000000  000011df  2**0
+ 11 .debug_ranges 00000010  00000000  00000000  00001194  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -59,7 +59,7 @@ Disassembly of section .text:
   2e:	de bf       	out	0x3e, r29	; 62
   30:	cd bf       	out	0x3d, r28	; 61
   32:	02 d0       	rcall	.+4      	; 0x38 <main>
-  34:	4d c0       	rjmp	.+154    	; 0xd0 <_exit>
+  34:	4a c0       	rjmp	.+148    	; 0xca <_exit>
 
 00000036 <__bad_interrupt>:
   36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
@@ -83,164 +83,150 @@ int main(void)
 	
 	int up = 0;	// счетчик на увеличене
 	int down = 0;	// счетчик на уменьшение
-	int count = 0;	// счетчик для светодиодов 
-  42:	40 e0       	ldi	r20, 0x00	; 0
-  44:	50 e0       	ldi	r21, 0x00	; 0
+	int count = -1;	// счетчик для светодиодов 
+  42:	8f ef       	ldi	r24, 0xFF	; 255
+  44:	9f ef       	ldi	r25, 0xFF	; 255
 	
     DDRB = (0 << 0) | (0 << 1);	// обозначаем выходы кнопок 
     PORTB = (1 << 0) | (1 << 1);	// включаем подтягивающий резистор 
 	
 	int up = 0;	// счетчик на увеличене
 	int down = 0;	// счетчик на уменьшение
-  46:	20 e0       	ldi	r18, 0x00	; 0
-  48:	30 e0       	ldi	r19, 0x00	; 0
+  46:	40 e0       	ldi	r20, 0x00	; 0
+  48:	50 e0       	ldi	r21, 0x00	; 0
 		// подаем низкий уровень сигнала на выход
 	
     DDRB = (0 << 0) | (0 << 1);	// обозначаем выходы кнопок 
     PORTB = (1 << 0) | (1 << 1);	// включаем подтягивающий резистор 
 	
 	int up = 0;	// счетчик на увеличене
-  4a:	80 e0       	ldi	r24, 0x00	; 0
-  4c:	90 e0       	ldi	r25, 0x00	; 0
-  4e:	03 c0       	rjmp	.+6      	; 0x56 <__SREG__+0x17>
-		}
-		if(~PINB & (1 << 1)) down = 1;	// при нажатии на вторую кнопку ставим флаг на уменьшение 
-		if(PINB & (1 << 1) && down == 1)
-		{
-			down = 0;
-			PORTD = (1 << count--);
-  50:	ab 01       	movw	r20, r22
+  4a:	20 e0       	ldi	r18, 0x00	; 0
+  4c:	30 e0       	ldi	r19, 0x00	; 0
+  4e:	02 c0       	rjmp	.+4      	; 0x54 <__SREG__+0x15>
 			}
 		}
 		if(~PINB & (1 << 1)) down = 1;	// при нажатии на вторую кнопку ставим флаг на уменьшение 
 		if(PINB & (1 << 1) && down == 1)
 		{
-			down = 0;
-  52:	20 e0       	ldi	r18, 0x00	; 0
-  54:	30 e0       	ldi	r19, 0x00	; 0
-	int count = 0;	// счетчик для светодиодов 
+			down = 0;	// снимаем флаг на уменьшение
+  50:	40 e0       	ldi	r20, 0x00	; 0
+  52:	50 e0       	ldi	r21, 0x00	; 0
+	int count = -1;	// счетчик для светодиодов 
 	
  
     while (1)
 	{
 		if(~PINB & (1 << 0)) up = 1;	// при нажатии на превую кнопку ставим флаг на увеличение 
-  56:	b0 99       	sbic	0x16, 0	; 22
-  58:	02 c0       	rjmp	.+4      	; 0x5e <__SREG__+0x1f>
-  5a:	81 e0       	ldi	r24, 0x01	; 1
-  5c:	90 e0       	ldi	r25, 0x00	; 0
+  54:	b0 99       	sbic	0x16, 0	; 22
+  56:	02 c0       	rjmp	.+4      	; 0x5c <__SREG__+0x1d>
+  58:	21 e0       	ldi	r18, 0x01	; 1
+  5a:	30 e0       	ldi	r19, 0x00	; 0
 		if(PINB & (1 << 0) && up == 1)
-  5e:	b0 9b       	sbis	0x16, 0	; 22
-  60:	1a c0       	rjmp	.+52     	; 0x96 <__SREG__+0x57>
-  62:	81 30       	cpi	r24, 0x01	; 1
-  64:	91 05       	cpc	r25, r1
-  66:	b9 f4       	brne	.+46     	; 0x96 <__SREG__+0x57>
+  5c:	b0 9b       	sbis	0x16, 0	; 22
+  5e:	18 c0       	rjmp	.+48     	; 0x90 <__SREG__+0x51>
+  60:	21 30       	cpi	r18, 0x01	; 1
+  62:	31 05       	cpc	r19, r1
+  64:	a9 f4       	brne	.+42     	; 0x90 <__SREG__+0x51>
 		{
-			up = 0;
-			PORTD = (1 << count++);
-  68:	ba 01       	movw	r22, r20
-  6a:	6f 5f       	subi	r22, 0xFF	; 255
-  6c:	7f 4f       	sbci	r23, 0xFF	; 255
-  6e:	81 e0       	ldi	r24, 0x01	; 1
-  70:	90 e0       	ldi	r25, 0x00	; 0
-  72:	02 c0       	rjmp	.+4      	; 0x78 <__SREG__+0x39>
-  74:	88 0f       	add	r24, r24
-  76:	99 1f       	adc	r25, r25
-  78:	4a 95       	dec	r20
-  7a:	e2 f7       	brpl	.-8      	; 0x74 <__SREG__+0x35>
-  7c:	82 bb       	out	0x12, r24	; 18
-			if(count >= 9)
-  7e:	69 30       	cpi	r22, 0x09	; 9
-  80:	71 05       	cpc	r23, r1
-  82:	34 f0       	brlt	.+12     	; 0x90 <__SREG__+0x51>
+			up = 0;	// снимаем флаг на повышение
+			count++;
+  66:	01 96       	adiw	r24, 0x01	; 1
+			PORTD = (1 << count);
+  68:	21 e0       	ldi	r18, 0x01	; 1
+  6a:	30 e0       	ldi	r19, 0x00	; 0
+  6c:	08 2e       	mov	r0, r24
+  6e:	02 c0       	rjmp	.+4      	; 0x74 <__SREG__+0x35>
+  70:	22 0f       	add	r18, r18
+  72:	33 1f       	adc	r19, r19
+  74:	0a 94       	dec	r0
+  76:	e2 f7       	brpl	.-8      	; 0x70 <__SREG__+0x31>
+  78:	22 bb       	out	0x12, r18	; 18
+			if(count >= 9)	// ограничитель, при достижении лимита сбрасывается в ноль
+  7a:	89 30       	cpi	r24, 0x09	; 9
+  7c:	91 05       	cpc	r25, r1
+  7e:	34 f0       	brlt	.+12     	; 0x8c <__SREG__+0x4d>
 			{
 			count = 0;
 			PORTD = 0b00000000;	
-  84:	12 ba       	out	0x12, r1	; 18
-		{
-			up = 0;
-			PORTD = (1 << count++);
-			if(count >= 9)
+  80:	12 ba       	out	0x12, r1	; 18
+			up = 0;	// снимаем флаг на повышение
+			count++;
+			PORTD = (1 << count);
+			if(count >= 9)	// ограничитель, при достижении лимита сбрасывается в ноль
 			{
 			count = 0;
-  86:	40 e0       	ldi	r20, 0x00	; 0
-  88:	50 e0       	ldi	r21, 0x00	; 0
+  82:	80 e0       	ldi	r24, 0x00	; 0
+  84:	90 e0       	ldi	r25, 0x00	; 0
     while (1)
 	{
 		if(~PINB & (1 << 0)) up = 1;	// при нажатии на превую кнопку ставим флаг на увеличение 
 		if(PINB & (1 << 0) && up == 1)
 		{
-			up = 0;
-  8a:	80 e0       	ldi	r24, 0x00	; 0
-  8c:	90 e0       	ldi	r25, 0x00	; 0
-  8e:	03 c0       	rjmp	.+6      	; 0x96 <__SREG__+0x57>
-			PORTD = (1 << count++);
-  90:	ab 01       	movw	r20, r22
-    while (1)
-	{
-		if(~PINB & (1 << 0)) up = 1;	// при нажатии на превую кнопку ставим флаг на увеличение 
-		if(PINB & (1 << 0) && up == 1)
-		{
-			up = 0;
-  92:	80 e0       	ldi	r24, 0x00	; 0
-  94:	90 e0       	ldi	r25, 0x00	; 0
+			up = 0;	// снимаем флаг на повышение
+  86:	20 e0       	ldi	r18, 0x00	; 0
+  88:	30 e0       	ldi	r19, 0x00	; 0
+  8a:	02 c0       	rjmp	.+4      	; 0x90 <__SREG__+0x51>
+  8c:	20 e0       	ldi	r18, 0x00	; 0
+  8e:	30 e0       	ldi	r19, 0x00	; 0
 			{
 			count = 0;
 			PORTD = 0b00000000;	
 			}
 		}
 		if(~PINB & (1 << 1)) down = 1;	// при нажатии на вторую кнопку ставим флаг на уменьшение 
-  96:	b1 99       	sbic	0x16, 1	; 22
-  98:	02 c0       	rjmp	.+4      	; 0x9e <__SREG__+0x5f>
-  9a:	21 e0       	ldi	r18, 0x01	; 1
-  9c:	30 e0       	ldi	r19, 0x00	; 0
+  90:	b1 99       	sbic	0x16, 1	; 22
+  92:	02 c0       	rjmp	.+4      	; 0x98 <__SREG__+0x59>
+  94:	41 e0       	ldi	r20, 0x01	; 1
+  96:	50 e0       	ldi	r21, 0x00	; 0
 		if(PINB & (1 << 1) && down == 1)
-  9e:	b1 9b       	sbis	0x16, 1	; 22
-  a0:	da cf       	rjmp	.-76     	; 0x56 <__SREG__+0x17>
-  a2:	21 30       	cpi	r18, 0x01	; 1
-  a4:	31 05       	cpc	r19, r1
-  a6:	b9 f6       	brne	.-82     	; 0x56 <__SREG__+0x17>
+  98:	b1 9b       	sbis	0x16, 1	; 22
+  9a:	dc cf       	rjmp	.-72     	; 0x54 <__SREG__+0x15>
+  9c:	41 30       	cpi	r20, 0x01	; 1
+  9e:	51 05       	cpc	r21, r1
+  a0:	c9 f6       	brne	.-78     	; 0x54 <__SREG__+0x15>
 		{
-			down = 0;
-			PORTD = (1 << count--);
-  a8:	ba 01       	movw	r22, r20
-  aa:	61 50       	subi	r22, 0x01	; 1
-  ac:	71 09       	sbc	r23, r1
-  ae:	21 e0       	ldi	r18, 0x01	; 1
-  b0:	30 e0       	ldi	r19, 0x00	; 0
-  b2:	02 c0       	rjmp	.+4      	; 0xb8 <__SREG__+0x79>
-  b4:	22 0f       	add	r18, r18
-  b6:	33 1f       	adc	r19, r19
-  b8:	4a 95       	dec	r20
-  ba:	e2 f7       	brpl	.-8      	; 0xb4 <__SREG__+0x75>
-  bc:	22 bb       	out	0x12, r18	; 18
-			if(count <= 0)
-  be:	16 16       	cp	r1, r22
-  c0:	17 06       	cpc	r1, r23
-  c2:	34 f2       	brlt	.-116    	; 0x50 <__SREG__+0x11>
+			down = 0;	// снимаем флаг на уменьшение
+			count--;
+  a2:	01 97       	sbiw	r24, 0x01	; 1
+			PORTD = (1 << count);
+  a4:	41 e0       	ldi	r20, 0x01	; 1
+  a6:	50 e0       	ldi	r21, 0x00	; 0
+  a8:	08 2e       	mov	r0, r24
+  aa:	02 c0       	rjmp	.+4      	; 0xb0 <__SREG__+0x71>
+  ac:	44 0f       	add	r20, r20
+  ae:	55 1f       	adc	r21, r21
+  b0:	0a 94       	dec	r0
+  b2:	e2 f7       	brpl	.-8      	; 0xac <__SREG__+0x6d>
+  b4:	42 bb       	out	0x12, r20	; 18
+			if(count <= -2)	// ограничитель, при достижении обнуляет все выходы 
+  b6:	8f 3f       	cpi	r24, 0xFF	; 255
+  b8:	4f ef       	ldi	r20, 0xFF	; 255
+  ba:	94 07       	cpc	r25, r20
+  bc:	4c f6       	brge	.-110    	; 0x50 <__SREG__+0x11>
 			{
 				count = 0;
 				PORTD = 0b00000000;
-  c4:	12 ba       	out	0x12, r1	; 18
-		{
-			down = 0;
-			PORTD = (1 << count--);
-			if(count <= 0)
+  be:	12 ba       	out	0x12, r1	; 18
+			down = 0;	// снимаем флаг на уменьшение
+			count--;
+			PORTD = (1 << count);
+			if(count <= -2)	// ограничитель, при достижении обнуляет все выходы 
 			{
 				count = 0;
-  c6:	40 e0       	ldi	r20, 0x00	; 0
-  c8:	50 e0       	ldi	r21, 0x00	; 0
+  c0:	80 e0       	ldi	r24, 0x00	; 0
+  c2:	90 e0       	ldi	r25, 0x00	; 0
 			}
 		}
 		if(~PINB & (1 << 1)) down = 1;	// при нажатии на вторую кнопку ставим флаг на уменьшение 
 		if(PINB & (1 << 1) && down == 1)
 		{
-			down = 0;
-  ca:	20 e0       	ldi	r18, 0x00	; 0
-  cc:	30 e0       	ldi	r19, 0x00	; 0
-  ce:	c3 cf       	rjmp	.-122    	; 0x56 <__SREG__+0x17>
+			down = 0;	// снимаем флаг на уменьшение
+  c4:	40 e0       	ldi	r20, 0x00	; 0
+  c6:	50 e0       	ldi	r21, 0x00	; 0
+  c8:	c5 cf       	rjmp	.-118    	; 0x54 <__SREG__+0x15>
 
-000000d0 <_exit>:
-  d0:	f8 94       	cli
+000000ca <_exit>:
+  ca:	f8 94       	cli
 
-000000d2 <__stop_program>:
-  d2:	ff cf       	rjmp	.-2      	; 0xd2 <__stop_program>
+000000cc <__stop_program>:
+  cc:	ff cf       	rjmp	.-2      	; 0xcc <__stop_program>
