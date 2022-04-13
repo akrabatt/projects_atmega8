@@ -3,27 +3,29 @@ timer_counter.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000048  00000000  00000000  00000054  2**1
+  0 .text         0000007a  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  0000009c  2**0
+  1 .data         00000000  00800060  00800060  000000ce  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  0000009c  2**0
+  2 .comment      00000030  00000000  00000000  000000ce  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000cc  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000100  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  00000108  2**0
+  4 .debug_aranges 00000020  00000000  00000000  0000013c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000513  00000000  00000000  00000128  2**0
+  5 .debug_info   00000522  00000000  00000000  0000015c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000004a1  00000000  00000000  0000063b  2**0
+  6 .debug_abbrev 000004b3  00000000  00000000  0000067e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001b5  00000000  00000000  00000adc  2**0
+  7 .debug_line   000001f7  00000000  00000000  00000b31  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00000c94  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000d28  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002aa  00000000  00000000  00000cb8  2**0
+  9 .debug_str    000002aa  00000000  00000000  00000d4c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000010  00000000  00000000  00000f62  2**0
+ 10 .debug_loc    00000024  00000000  00000000  00000ff6  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000010  00000000  00000000  0000101a  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -57,7 +59,7 @@ Disassembly of section .text:
   2e:	de bf       	out	0x3e, r29	; 62
   30:	cd bf       	out	0x3d, r28	; 61
   32:	02 d0       	rcall	.+4      	; 0x38 <main>
-  34:	07 c0       	rjmp	.+14     	; 0x44 <_exit>
+  34:	20 c0       	rjmp	.+64     	; 0x76 <_exit>
 
 00000036 <__bad_interrupt>:
   36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
@@ -68,20 +70,72 @@ Disassembly of section .text:
 
 int main(void)
 {
-	DDRD = 0b11111111;
+	DDRD = 0b11111111; // обозначаем все порты на выход
   38:	8f ef       	ldi	r24, 0xFF	; 255
   3a:	81 bb       	out	0x11, r24	; 17
-	PORTD = 0b00000000;
+	PORTD = 0b00000000;    // высокое входное напряжение
   3c:	12 ba       	out	0x12, r1	; 18
+
+	TCCR0 |= (1 << CS00) | (1 << CS02) ;    // включаем таймер с предделителем частоты 1024
+  3e:	83 b7       	in	r24, 0x33	; 51
+  40:	85 60       	ori	r24, 0x05	; 5
+  42:	83 bf       	out	0x33, r24	; 51
+    TCNT0 = 0;	// сбрасываем таймер в ноль 
+  44:	12 be       	out	0x32, r1	; 50
 	
+	int a = 0;	// переменная для сложения значений таймера
+  46:	80 e0       	ldi	r24, 0x00	; 0
+  48:	90 e0       	ldi	r25, 0x00	; 0
+  4a:	02 c0       	rjmp	.+4      	; 0x50 <__SREG__+0x11>
+		{
+			PORTD = 0b01010101;
+		}
+		if (a > 12)
+		{
+			a = 0;
+  4c:	80 e0       	ldi	r24, 0x00	; 0
+  4e:	90 e0       	ldi	r25, 0x00	; 0
+	
+	int a = 0;	// переменная для сложения значений таймера
+	
+	while(1)
+	{
+		if(TCNT0 == 100)
+  50:	22 b7       	in	r18, 0x32	; 50
+  52:	24 36       	cpi	r18, 0x64	; 100
+  54:	11 f4       	brne	.+4      	; 0x5a <__SREG__+0x1b>
+		{
+			a++;
+  56:	01 96       	adiw	r24, 0x01	; 1
+			TCNT0 = 0;
+  58:	12 be       	out	0x32, r1	; 50
+		}
+		if (a == 3)
+  5a:	83 30       	cpi	r24, 0x03	; 3
+  5c:	91 05       	cpc	r25, r1
+  5e:	11 f4       	brne	.+4      	; 0x64 <__SREG__+0x25>
+		{
+			PORTD = 0b10101010;
+  60:	2a ea       	ldi	r18, 0xAA	; 170
+  62:	22 bb       	out	0x12, r18	; 18
+		}
+		if (a == 6)
+  64:	86 30       	cpi	r24, 0x06	; 6
+  66:	91 05       	cpc	r25, r1
+  68:	11 f4       	brne	.+4      	; 0x6e <__SREG__+0x2f>
+		{
+			PORTD = 0b01010101;
+  6a:	25 e5       	ldi	r18, 0x55	; 85
+  6c:	22 bb       	out	0x12, r18	; 18
+		}
+		if (a > 12)
+  6e:	8d 30       	cpi	r24, 0x0D	; 13
+  70:	91 05       	cpc	r25, r1
+  72:	64 f7       	brge	.-40     	; 0x4c <__SREG__+0xd>
+  74:	ed cf       	rjmp	.-38     	; 0x50 <__SREG__+0x11>
 
-}
-  3e:	80 e0       	ldi	r24, 0x00	; 0
-  40:	90 e0       	ldi	r25, 0x00	; 0
-  42:	08 95       	ret
+00000076 <_exit>:
+  76:	f8 94       	cli
 
-00000044 <_exit>:
-  44:	f8 94       	cli
-
-00000046 <__stop_program>:
-  46:	ff cf       	rjmp	.-2      	; 0x46 <__stop_program>
+00000078 <__stop_program>:
+  78:	ff cf       	rjmp	.-2      	; 0x78 <__stop_program>
