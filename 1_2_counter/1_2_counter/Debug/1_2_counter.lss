@@ -3,27 +3,27 @@
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000066  00000000  00000000  00000054  2**1
+  0 .text         00000060  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  000000ba  2**0
+  1 .data         00000000  00800060  00800060  000000b4  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  000000ba  2**0
+  2 .comment      00000030  00000000  00000000  000000b4  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000ec  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000e4  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  00000128  2**0
+  4 .debug_aranges 00000020  00000000  00000000  00000120  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   0000051f  00000000  00000000  00000148  2**0
+  5 .debug_info   00000514  00000000  00000000  00000140  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000004a4  00000000  00000000  00000667  2**0
+  6 .debug_abbrev 000004a4  00000000  00000000  00000654  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001d3  00000000  00000000  00000b0b  2**0
+  7 .debug_line   000001d3  00000000  00000000  00000af8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00000ce0  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000ccc  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002af  00000000  00000000  00000d04  2**0
+  9 .debug_str    000002a6  00000000  00000000  00000cf0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000010  00000000  00000000  00000fb3  2**0
+ 10 .debug_ranges 00000010  00000000  00000000  00000f96  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -57,7 +57,7 @@ Disassembly of section .text:
   2e:	de bf       	out	0x3e, r29	; 62
   30:	cd bf       	out	0x3d, r28	; 61
   32:	02 d0       	rcall	.+4      	; 0x38 <main>
-  34:	16 c0       	rjmp	.+44     	; 0x62 <_exit>
+  34:	13 c0       	rjmp	.+38     	; 0x5c <_exit>
 
 00000036 <__bad_interrupt>:
   36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
@@ -68,46 +68,43 @@ Disassembly of section .text:
 
 int main(void)
 {
-	DDRD = 0b11111111;
+    DDRD = 0b11111111;
   38:	8f ef       	ldi	r24, 0xFF	; 255
   3a:	81 bb       	out	0x11, r24	; 17
-	PORTD = 0b00000000;
+    PORTD = 0b00000000;
   3c:	12 ba       	out	0x12, r1	; 18
-	
-	//TCCR1B = (CS10 << 0) | (CS11 << 1);
-	TCCR1B = 0b00000011;
-  3e:	83 e0       	ldi	r24, 0x03	; 3
-  40:	8e bd       	out	0x2e, r24	; 46
-	TCNT1 = 0; // обнуляем счетчик
-  42:	1d bc       	out	0x2d, r1	; 45
-  44:	1c bc       	out	0x2c, r1	; 44
-	
+    
+    TCCR2 |= (1 << 2);  // инициализируем предделитель на 64
+  3e:	85 b5       	in	r24, 0x25	; 37
+  40:	84 60       	ori	r24, 0x04	; 4
+  42:	85 bd       	out	0x25, r24	; 37
+    
+    TCNT2 = 0; // обнуляем счетчик
+  44:	14 bc       	out	0x24, r1	; 36
+    
     while (1) 
     {
-		if (TCNT1 == 0)
-  46:	8c b5       	in	r24, 0x2c	; 44
-  48:	9d b5       	in	r25, 0x2d	; 45
-  4a:	89 2b       	or	r24, r25
-  4c:	11 f4       	brne	.+4      	; 0x52 <__SREG__+0x13>
-		{
-			PORTD = 0b00001111;
-  4e:	8f e0       	ldi	r24, 0x0F	; 15
-  50:	82 bb       	out	0x12, r24	; 18
-		}
-		if (TCNT1 == 0xFFFF/2)
-  52:	8c b5       	in	r24, 0x2c	; 44
-  54:	9d b5       	in	r25, 0x2d	; 45
-  56:	8f 3f       	cpi	r24, 0xFF	; 255
-  58:	9f 47       	sbci	r25, 0x7F	; 127
-  5a:	a9 f7       	brne	.-22     	; 0x46 <__SREG__+0x7>
-		{
-			PORTD = 0b11110000;
-  5c:	80 ef       	ldi	r24, 0xF0	; 240
-  5e:	82 bb       	out	0x12, r24	; 18
-  60:	f2 cf       	rjmp	.-28     	; 0x46 <__SREG__+0x7>
+        if (TCNT2 == 0)                                                                 
+  46:	84 b5       	in	r24, 0x24	; 36
+  48:	81 11       	cpse	r24, r1
+  4a:	02 c0       	rjmp	.+4      	; 0x50 <__SREG__+0x11>
+        {
+            PORTD = 0b00001111;
+  4c:	8f e0       	ldi	r24, 0x0F	; 15
+  4e:	82 bb       	out	0x12, r24	; 18
+        }
+        if (TCNT2 == 128)  // при заполнении счетчика на половину
+  50:	84 b5       	in	r24, 0x24	; 36
+  52:	80 38       	cpi	r24, 0x80	; 128
+  54:	c1 f7       	brne	.-16     	; 0x46 <__SREG__+0x7>
+        {
+            PORTD = 0b11110000;
+  56:	80 ef       	ldi	r24, 0xF0	; 240
+  58:	82 bb       	out	0x12, r24	; 18
+  5a:	f5 cf       	rjmp	.-22     	; 0x46 <__SREG__+0x7>
 
-00000062 <_exit>:
-  62:	f8 94       	cli
+0000005c <_exit>:
+  5c:	f8 94       	cli
 
-00000064 <__stop_program>:
-  64:	ff cf       	rjmp	.-2      	; 0x64 <__stop_program>
+0000005e <__stop_program>:
+  5e:	ff cf       	rjmp	.-2      	; 0x5e <__stop_program>
