@@ -3,27 +3,29 @@
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000060  00000000  00000000  00000054  2**1
+  0 .text         00000072  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  000000b4  2**0
+  1 .data         00000000  00800060  00800060  000000c6  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  000000b4  2**0
+  2 .comment      00000030  00000000  00000000  000000c6  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000e4  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000f8  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  00000120  2**0
+  4 .debug_aranges 00000020  00000000  00000000  00000134  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000514  00000000  00000000  00000140  2**0
+  5 .debug_info   00000522  00000000  00000000  00000154  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000004a4  00000000  00000000  00000654  2**0
+  6 .debug_abbrev 000004b3  00000000  00000000  00000676  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001d3  00000000  00000000  00000af8  2**0
+  7 .debug_line   000001eb  00000000  00000000  00000b29  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00000ccc  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000d14  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002a6  00000000  00000000  00000cf0  2**0
+  9 .debug_str    000002a6  00000000  00000000  00000d38  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000010  00000000  00000000  00000f96  2**0
+ 10 .debug_loc    00000030  00000000  00000000  00000fde  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000010  00000000  00000000  0000100e  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -57,7 +59,7 @@ Disassembly of section .text:
   2e:	de bf       	out	0x3e, r29	; 62
   30:	cd bf       	out	0x3d, r28	; 61
   32:	02 d0       	rcall	.+4      	; 0x38 <main>
-  34:	13 c0       	rjmp	.+38     	; 0x5c <_exit>
+  34:	1c c0       	rjmp	.+56     	; 0x6e <_exit>
 
 00000036 <__bad_interrupt>:
   36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
@@ -74,37 +76,58 @@ int main(void)
     PORTD = 0b00000000;
   3c:	12 ba       	out	0x12, r1	; 18
     
-    TCCR2 |= (1 << 2);  // инициализируем предделитель на 64
+    TCCR2 |= (1 << 2) | (1 << 1) | (1 << 0);  // инициализируем предделитель на 64
   3e:	85 b5       	in	r24, 0x25	; 37
-  40:	84 60       	ori	r24, 0x04	; 4
+  40:	87 60       	ori	r24, 0x07	; 7
   42:	85 bd       	out	0x25, r24	; 37
-    
     TCNT2 = 0; // обнуляем счетчик
   44:	14 bc       	out	0x24, r1	; 36
+#define F_CPU 1000000UL // принудительно задаем частоту
+#include <avr/io.h>
+
+
+int main(void)
+{
+  46:	80 e0       	ldi	r24, 0x00	; 0
+  48:	90 e0       	ldi	r25, 0x00	; 0
     
+    int x = 0;
+
     while (1) 
     {
-        if (TCNT2 == 0)                                                                 
-  46:	84 b5       	in	r24, 0x24	; 36
-  48:	81 11       	cpse	r24, r1
-  4a:	02 c0       	rjmp	.+4      	; 0x50 <__SREG__+0x11>
+        if (TCNT2 == 1)                                                                 
+  4a:	24 b5       	in	r18, 0x24	; 36
+  4c:	21 30       	cpi	r18, 0x01	; 1
+  4e:	11 f4       	brne	.+4      	; 0x54 <__SREG__+0x15>
+        {
+            x++;
+  50:	01 96       	adiw	r24, 0x01	; 1
+            TCNT2 = 0;
+  52:	14 bc       	out	0x24, r1	; 36
+        }
+        if (x == 488)  // при заполнении счетчика на половину
+  54:	88 3e       	cpi	r24, 0xE8	; 232
+  56:	21 e0       	ldi	r18, 0x01	; 1
+  58:	92 07       	cpc	r25, r18
+  5a:	11 f4       	brne	.+4      	; 0x60 <__SREG__+0x21>
         {
             PORTD = 0b00001111;
-  4c:	8f e0       	ldi	r24, 0x0F	; 15
-  4e:	82 bb       	out	0x12, r24	; 18
+  5c:	2f e0       	ldi	r18, 0x0F	; 15
+  5e:	22 bb       	out	0x12, r18	; 18
         }
-        if (TCNT2 == 128)  // при заполнении счетчика на половину
-  50:	84 b5       	in	r24, 0x24	; 36
-  52:	80 38       	cpi	r24, 0x80	; 128
-  54:	c1 f7       	brne	.-16     	; 0x46 <__SREG__+0x7>
+        if (x == 976)
+  60:	80 3d       	cpi	r24, 0xD0	; 208
+  62:	23 e0       	ldi	r18, 0x03	; 3
+  64:	92 07       	cpc	r25, r18
+  66:	89 f7       	brne	.-30     	; 0x4a <__SREG__+0xb>
         {
-            PORTD = 0b11110000;
-  56:	80 ef       	ldi	r24, 0xF0	; 240
-  58:	82 bb       	out	0x12, r24	; 18
-  5a:	f5 cf       	rjmp	.-22     	; 0x46 <__SREG__+0x7>
+        	PORTD = 0b11110000;
+  68:	80 ef       	ldi	r24, 0xF0	; 240
+  6a:	82 bb       	out	0x12, r24	; 18
+  6c:	ec cf       	rjmp	.-40     	; 0x46 <__SREG__+0x7>
 
-0000005c <_exit>:
-  5c:	f8 94       	cli
+0000006e <_exit>:
+  6e:	f8 94       	cli
 
-0000005e <__stop_program>:
-  5e:	ff cf       	rjmp	.-2      	; 0x5e <__stop_program>
+00000070 <__stop_program>:
+  70:	ff cf       	rjmp	.-2      	; 0x70 <__stop_program>
