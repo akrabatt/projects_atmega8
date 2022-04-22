@@ -3,29 +3,29 @@
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000072  00000000  00000000  00000054  2**1
+  0 .text         000000a4  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  000000c6  2**0
+  1 .data         00000000  00800060  00800060  000000f8  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  000000c6  2**0
+  2 .comment      00000030  00000000  00000000  000000f8  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000000f8  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000128  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  00000134  2**0
+  4 .debug_aranges 00000020  00000000  00000000  00000164  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000522  00000000  00000000  00000154  2**0
+  5 .debug_info   00000539  00000000  00000000  00000184  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000004b3  00000000  00000000  00000676  2**0
+  6 .debug_abbrev 000004c2  00000000  00000000  000006bd  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001eb  00000000  00000000  00000b29  2**0
+  7 .debug_line   00000239  00000000  00000000  00000b7f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00000d14  2**2
+  8 .debug_frame  00000024  00000000  00000000  00000db8  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000002a6  00000000  00000000  00000d38  2**0
+  9 .debug_str    000002a6  00000000  00000000  00000ddc  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000030  00000000  00000000  00000fde  2**0
+ 10 .debug_loc    00000070  00000000  00000000  00001082  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000010  00000000  00000000  0000100e  2**0
+ 11 .debug_ranges 00000010  00000000  00000000  000010f2  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -59,7 +59,7 @@ Disassembly of section .text:
   2e:	de bf       	out	0x3e, r29	; 62
   30:	cd bf       	out	0x3d, r28	; 61
   32:	02 d0       	rcall	.+4      	; 0x38 <main>
-  34:	1c c0       	rjmp	.+56     	; 0x6e <_exit>
+  34:	35 c0       	rjmp	.+106    	; 0xa0 <_exit>
 
 00000036 <__bad_interrupt>:
   36:	e4 cf       	rjmp	.-56     	; 0x0 <__vectors>
@@ -70,64 +70,110 @@ Disassembly of section .text:
 
 int main(void)
 {
-    DDRD = 0b11111111;
+    DDRD = 0b11111111;	// обозначаем выходы светодиодов
   38:	8f ef       	ldi	r24, 0xFF	; 255
   3a:	81 bb       	out	0x11, r24	; 17
-    PORTD = 0b00000000;
+    PORTD = 0b00000000;	// обозначаем низкий уровень сигнала на выходы светодиодов 
   3c:	12 ba       	out	0x12, r1	; 18
+
+    DDRB = (0 << 0) | (0 << 1);	// обозначаем выходы кнопок 
+  3e:	17 ba       	out	0x17, r1	; 23
+    PORTB = (1 << 0) | (1 << 1); // включаем подт€гивающий резистор 
+  40:	83 e0       	ldi	r24, 0x03	; 3
+  42:	88 bb       	out	0x18, r24	; 24
     
     TCCR2 |= (1 << 2) | (1 << 1) | (1 << 0);  // инициализируем предделитель на 64
-  3e:	85 b5       	in	r24, 0x25	; 37
-  40:	87 60       	ori	r24, 0x07	; 7
-  42:	85 bd       	out	0x25, r24	; 37
+  44:	85 b5       	in	r24, 0x25	; 37
+  46:	87 60       	ori	r24, 0x07	; 7
+  48:	85 bd       	out	0x25, r24	; 37
     TCNT2 = 0; // обнул€ем счетчик
-  44:	14 bc       	out	0x24, r1	; 36
-#define F_CPU 1000000UL // принудительно задаем частоту
-#include <avr/io.h>
-
-
-int main(void)
-{
-  46:	80 e0       	ldi	r24, 0x00	; 0
-  48:	90 e0       	ldi	r25, 0x00	; 0
+  4a:	14 bc       	out	0x24, r1	; 36
     
-    int x = 0;
+    int x = 0; // переменна€ дл€ счетчика
+    int a = 0;	// переменна€ дл€ флага включени€ счетчика по кнопке 
+  4c:	80 e0       	ldi	r24, 0x00	; 0
+  4e:	90 e0       	ldi	r25, 0x00	; 0
+    PORTB = (1 << 0) | (1 << 1); // включаем подт€гивающий резистор 
+    
+    TCCR2 |= (1 << 2) | (1 << 1) | (1 << 0);  // инициализируем предделитель на 64
+    TCNT2 = 0; // обнул€ем счетчик
+    
+    int x = 0; // переменна€ дл€ счетчика
+  50:	20 e0       	ldi	r18, 0x00	; 0
+  52:	30 e0       	ldi	r19, 0x00	; 0
+    int a = 0;	// переменна€ дл€ флага включени€ счетчика по кнопке 
+    int b = 0;	// переменна€ дл€ флага отключени€ счетчика по второй кнопке
 
     while (1) 
     {
-        if (TCNT2 == 1)                                                                 
-  4a:	24 b5       	in	r18, 0x24	; 36
-  4c:	21 30       	cpi	r18, 0x01	; 1
-  4e:	11 f4       	brne	.+4      	; 0x54 <__SREG__+0x15>
-        {
-            x++;
-  50:	01 96       	adiw	r24, 0x01	; 1
-            TCNT2 = 0;
-  52:	14 bc       	out	0x24, r1	; 36
-        }
-        if (x == 488)  // при заполнении счетчика на половину
-  54:	88 3e       	cpi	r24, 0xE8	; 232
-  56:	21 e0       	ldi	r18, 0x01	; 1
-  58:	92 07       	cpc	r25, r18
-  5a:	11 f4       	brne	.+4      	; 0x60 <__SREG__+0x21>
-        {
-            PORTD = 0b00001111;
-  5c:	2f e0       	ldi	r18, 0x0F	; 15
-  5e:	22 bb       	out	0x12, r18	; 18
-        }
-        if (x == 976)
-  60:	80 3d       	cpi	r24, 0xD0	; 208
-  62:	23 e0       	ldi	r18, 0x03	; 3
-  64:	92 07       	cpc	r25, r18
-  66:	89 f7       	brne	.-30     	; 0x4a <__SREG__+0xb>
-        {
-        	PORTD = 0b11110000;
-  68:	80 ef       	ldi	r24, 0xF0	; 240
-  6a:	82 bb       	out	0x12, r24	; 18
-  6c:	ec cf       	rjmp	.-40     	; 0x46 <__SREG__+0x7>
+    	if (~PINB & (1 << 0)) a = 1;
+  54:	b0 99       	sbic	0x16, 0	; 22
+  56:	02 c0       	rjmp	.+4      	; 0x5c <__SREG__+0x1d>
+  58:	81 e0       	ldi	r24, 0x01	; 1
+  5a:	90 e0       	ldi	r25, 0x00	; 0
+    	if (PINB & (1 << 0) && a == 1)
+  5c:	b0 9b       	sbis	0x16, 0	; 22
+  5e:	fa cf       	rjmp	.-12     	; 0x54 <__SREG__+0x15>
+  60:	81 30       	cpi	r24, 0x01	; 1
+  62:	91 05       	cpc	r25, r1
+  64:	b9 f7       	brne	.-18     	; 0x54 <__SREG__+0x15>
+    	{
+    		if (TCNT2 == 1)                                                                 
+  66:	44 b5       	in	r20, 0x24	; 36
+  68:	41 30       	cpi	r20, 0x01	; 1
+  6a:	19 f4       	brne	.+6      	; 0x72 <__SREG__+0x33>
+        	{
+            	x++;
+  6c:	2f 5f       	subi	r18, 0xFF	; 255
+  6e:	3f 4f       	sbci	r19, 0xFF	; 255
+            	TCNT2 = 0;
+  70:	14 bc       	out	0x24, r1	; 36
+        	}
+        	if (x == 488)  // при заполнении счетчика на половину
+  72:	28 3e       	cpi	r18, 0xE8	; 232
+  74:	41 e0       	ldi	r20, 0x01	; 1
+  76:	34 07       	cpc	r19, r20
+  78:	11 f4       	brne	.+4      	; 0x7e <__SREG__+0x3f>
+        	{
+            	PORTD = 0b00001111;
+  7a:	4f e0       	ldi	r20, 0x0F	; 15
+  7c:	42 bb       	out	0x12, r20	; 18
+        	}
+        	if (x == 976)
+  7e:	20 3d       	cpi	r18, 0xD0	; 208
+  80:	43 e0       	ldi	r20, 0x03	; 3
+  82:	34 07       	cpc	r19, r20
+  84:	21 f4       	brne	.+8      	; 0x8e <__SREG__+0x4f>
+        	{
+        		PORTD = 0b11110000;
+  86:	20 ef       	ldi	r18, 0xF0	; 240
+  88:	22 bb       	out	0x12, r18	; 18
+        		x = 0;
+  8a:	20 e0       	ldi	r18, 0x00	; 0
+  8c:	30 e0       	ldi	r19, 0x00	; 0
+        	}
+        	if(~PINB & (1 << 1) && a == 1) 
+  8e:	b1 99       	sbic	0x16, 1	; 22
+  90:	e1 cf       	rjmp	.-62     	; 0x54 <__SREG__+0x15>
+  92:	81 30       	cpi	r24, 0x01	; 1
+  94:	91 05       	cpc	r25, r1
+  96:	f1 f6       	brne	.-68     	; 0x54 <__SREG__+0x15>
+        	{
+        		a = 0;
+        		PORTD = 0b00000000;
+  98:	12 ba       	out	0x12, r1	; 18
+        		PORTD = 0b11110000;
+        		x = 0;
+        	}
+        	if(~PINB & (1 << 1) && a == 1) 
+        	{
+        		a = 0;
+  9a:	80 e0       	ldi	r24, 0x00	; 0
+  9c:	90 e0       	ldi	r25, 0x00	; 0
+  9e:	da cf       	rjmp	.-76     	; 0x54 <__SREG__+0x15>
 
-0000006e <_exit>:
-  6e:	f8 94       	cli
+000000a0 <_exit>:
+  a0:	f8 94       	cli
 
-00000070 <__stop_program>:
-  70:	ff cf       	rjmp	.-2      	; 0x70 <__stop_program>
+000000a2 <__stop_program>:
+  a2:	ff cf       	rjmp	.-2      	; 0xa2 <__stop_program>
